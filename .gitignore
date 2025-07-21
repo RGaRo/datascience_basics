@@ -1,0 +1,27 @@
+# Bytecode / cache
+__pycache__/
+*.py[cod]
+
+# Entornos virtuales
+venv/
+.env/
+
+# Archivos temporales
+*.log
+*.tmp
+*.swp
+
+# Archivos de sistema
+.DS_Store
+
+# Archivos creados por pytest
+.cache/
+.pytest_cache/
+
+# Archivos de build
+dist/
+build/
+*.egg-info/
+
+# Archivos deprecados
+**/_old*/
