@@ -25,3 +25,4 @@ build/
 
 # Archivos deprecados
 **/_old*/
+**/nb_testing*
