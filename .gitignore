@@ -26,4 +26,4 @@ build/
 # Archivos deprecados
 **/_old*/
 **/nb_testing*
-*/spam_data/*
+workbook/datasets/spam_data/
