@@ -50,3 +50,12 @@ def f1_score(tp: int, tn: int, fp: int, fn: int) -> float:
     p = precision(tp, fp)
     r = recall(tp, fn)
     return 2 * p * r / (p + r)
+
+
+def mean_squared_error(y_true, y_pred):
+    """
+    Computes the MSE of 2 lists
+    """
+    return sum((a - b) ** 2 for a, b in zip(y_true, y_pred)) / len(
+        y_true
+    )

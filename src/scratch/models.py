@@ -1,20 +1,23 @@
 """Module for machine learning models."""
 
 # Third party libraries
+import random
 import numpy as np
 
 # Specific functions
+from tqdm import tqdm
 from math import log, exp
 from statistics import mean
 from collections import Counter, defaultdict
 from sklearn.metrics import confusion_matrix
 from typing import List, Dict, Iterable, Tuple, Literal
 
-# Own library
-from .complex_typing import Vector
+# Own libraries
 from .linear_algebra import distance
-from .metrics import precision, recall, f1_score
+from .complex_typing import Vector, X, Y
+from .gradient_descent import gradient_step
 from .data_preprocessing import LabeledPoint, Message, tokenize
+from .metrics import precision, recall, f1_score, mean_squared_error
 
 
 class KNNClassifier:
@@ -412,3 +415,89 @@ class NaiveBayesSpamClassifier:
                 "recall": _recall,
                 "f1_score": _f1_score,
             }
+
+
+class SimpleLinearRegression:
+    """
+    A class for a simple linear regression model
+    """
+
+    def __init__(self):
+        self.intercept = random.random()
+        self.slope = random.random()
+        self.learning_rate = 0
+        self.epochs = 0
+
+    def fit(
+        self,
+        x_vals: List[X],
+        y_vals: List[Y],
+        learning_rate: float = 0.001,
+        epochs: int = 500,
+    ) -> Dict[str, float]:
+        self.intercept = random.random()
+        self.slope = random.random()
+        self.learning_rate = learning_rate
+        self.epochs = epochs
+        pbar = tqdm(
+            range(1, epochs + 1), desc="Training model (epochs)"
+        )
+        print(
+            f"(intercept, slope):[{self.intercept:.5f}, {self.slope:.5f}]"
+        )
+        for epoch in pbar:
+            intercept_gradient, slope_gradient = (
+                self._simple_linear_regression_gradient(x_vals, y_vals)
+            )
+            self.intercept += intercept_gradient * -learning_rate
+            self.slope += slope_gradient * -learning_rate
+            _y_vals = [
+                self.intercept + (self.slope * x) for x in x_vals
+            ]
+            mse = mean_squared_error(y_vals, _y_vals)
+            pbar.set_postfix(mse=round(mse, 4))
+            if epoch % 50 == 0 or epoch == 1 or epoch == epochs:
+                print(
+                    f"MSE:{mse} - Epochs:{epoch } - Gradient:[{intercept_gradient:.5f}, {slope_gradient:.5f}] - (intercept, slope):[{self.intercept:.5f}, {self.slope:.5f}]"
+                )
+
+    # We define the gradient function
+    def _simple_linear_regression_gradient(
+        self, x_vals: Vector, y_vals: Vector
+    ) -> dict:
+        """This function compute a simple linear regression gradient considering
+        MSE as loss function.
+        """
+        if len(x_vals) != len(y_vals):
+            raise AssertionError(
+                "x_vals and y_vals vectors must have same length"
+            )
+        else:
+            x_y_pairs = zip(
+                x_vals, y_vals
+            )  # Make an iterable with tuples of (x_i, y_i)
+            errors = [
+                (self.intercept + (self.slope * x)) - y
+                for x, y in x_y_pairs
+            ]  # Compute the error for each single pairs of (xi, yi)
+            intercept_gradient = sum(
+                [2 * error for x, error in zip(x_vals, errors)]
+            ) / len(x_vals)
+            slope_gradient = sum(
+                [2 * error * x for x, error in zip(x_vals, errors)]
+            ) / len(x_vals)
+            return [intercept_gradient, slope_gradient]
+
+    def metrics(
+        self, x_test_vals: List[X], y_test_vals: List[Y]
+    ) -> Dict[str, float]:
+        """
+        Compute the metrics
+        mse
+        """
+        _y_pred = [
+            (self.intercept + (self.slope * x)) for x in x_test_vals
+        ]
+        mse = mean_squared_error(y_test_vals, _y_pred)
+
+        return {"mse": mse}
