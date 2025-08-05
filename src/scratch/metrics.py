@@ -59,3 +59,33 @@ def mean_squared_error(y_true, y_pred):
     return sum((a - b) ** 2 for a, b in zip(y_true, y_pred)) / len(
         y_true
     )
+
+
+def print_classification_report(report: dict):
+    labels = report["labels"]
+    cm = report["confusion_matrix"]
+    cm_details = report["confusion_matrix_detailes"]
+
+    print("\n=== Classification Report ===")
+    print(f"{'Labels:':<5} {labels}")
+
+    print("\nConfusion Matrix:")
+    for row in cm:
+        print("  " + "  ".join(f"{val:>2}" for val in row))
+
+    print("\nDetailed Confusion Metrics per Class:")
+    for label in labels:
+        metrics = cm_details[label]
+        print(
+            f"  {label:<12} -> "
+            f"TP: {metrics['tp']:>2}, "
+            f"TN: {metrics['tn']:>2}, "
+            f"FP: {metrics['fp']:>2}, "
+            f"FN: {metrics['fn']:>2}"
+        )
+
+    print("\nOverall Metrics:")
+    print(f"  Accuracy : {report['accuracy']:.4f}")
+    print(f"  Precision: {report['precision']:.4f}")
+    print(f"  Recall   : {report['recall']:.4f}")
+    print(f"  F1 Score : {report['f1_score']:.4f}")
